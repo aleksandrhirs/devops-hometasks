@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+    config.vm.define "vbox1" do |vbox1|
+
+        vbox1.vm.provider "virtualbox" do |vb|
+            vb.name = "task2_1_static"
+            vb.memory = "512"
+        end
+
+        vbox1.vm.synced_folder ".", "/vagrant"
+        vbox1.vm.network "private_network", ip: "192.168.33.10"
+
+        vbox1.vm.box = "generic/debian11"
+        vbox1.vm.provision "shell", inline: <<-SHELL
+            echo "Start install vbox1"
+            sudo apt-get update
+            sudo apt-get install -y apache2
+            sudo cp /vagrant/index.html /var/www/html/
+            sudo systemctl enable apache2
+            sudo systemctl restart apache2
+        SHELL
+    end
+
+    config.vm.define "vbox2" do |vbox2|
+
+        vbox2.vm.provider "virtualbox" do |vb|
+            vb.name = "task2_2_dynamic"
+            vb.memory = "512"
+        end
+
+        vbox2.vm.synced_folder ".", "/vagrant"
+        vbox2.vm.network "private_network", ip: "192.168.33.11"
+
+        vbox2.vm.box = "generic/debian11"
+        vbox2.vm.provision "shell", inline: <<-SHELL
+            echo "Start install vbox2"
+            sudo apt-get update
+            sudo apt-get install -y apache2 php libapache2-mod-php
+            sudo cp /vagrant/index.php /var/www/html/
+            sudo rm /var/www/html/index.html
+            sudo systemctl enable apache2
+            sudo systemctl restart apache2
+        SHELL
+    end
+
+end
