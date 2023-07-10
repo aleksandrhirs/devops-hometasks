@@ -1,0 +1,51 @@
+---
+- name: Master provision
+  hosts: master
+
+  tasks:
+    - name: Install Apache and PHP
+      become: yes
+      apt:
+        update_cache: yes
+        pkg:
+          - apache2
+          - php
+          - libapache2-mod-php
+        state: present
+
+    - name: Add 8081 port to listen
+      become: yes
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        line: 'Listen 8081'
+        insertafter: EOF
+
+    - name: Copy index.html
+      become: yes
+      copy:
+        src: /vagrant/index.html
+        dest: /var/www/html/
+
+    - name: Create PHP directory
+      become: yes
+      file:
+        path: /var/www/html/php
+        state: directory
+
+    - name: Copy index.php
+      become: yes
+      copy:
+        src: /vagrant/index.php
+        dest: /var/www/html/php/
+
+    - name: Copy index.php
+      become: yes
+      copy:
+        src: /vagrant/000-default.conf
+        dest: /etc/apache2/sites-available/
+
+    - name: Restart Apache
+      become: yes
+      systemd:
+        name: apache2
+        state: restarted

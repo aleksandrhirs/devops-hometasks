@@ -1,0 +1,92 @@
+---
+# Edit key-file permissions
+- name: Touch the file, but add/remove some permissions
+  hosts: node2
+  tasks:
+    - file:
+        path: '{{ item.fpath }}'
+        state: file
+        owner: vagrant
+        mode: u+rw,g-rwx,o-rwx
+      loop:
+        - { fpath: /home/vagrant/private_key_node0 }
+        - { fpath: /home/vagrant/private_key_node1 }
+
+# Playbook 0, будет выполняться только на хосте с именем node0 192.168.33.9
+- name: Node0 config
+  hosts: node0
+  become: true
+  tasks:
+    - name: Install Apache
+      apt:
+        update_cache: yes
+        name: apache2
+        state: present
+
+    - name: Copy index.html
+      copy:
+        src: /vagrant/index.html
+        dest: /var/www/html/
+
+    - name: Restart Apache
+      systemd:
+        name: apache2
+        state: restarted
+
+# Playbook 1, будет выполняться только на хосте с именем node1 192.168.33.10
+- name: Node1 config
+  hosts: node1
+  become: true
+  tasks:
+    - name: Install Apache and PHP
+      apt:
+        update_cache: yes
+        pkg:
+          - apache2
+          - php
+          - libapache2-mod-php
+        state: present
+
+    - name: Copy index.php
+      copy:
+        src: /vagrant/index.php
+        dest: /var/www/html/
+
+    - name: Remove index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Restart Apache
+      systemd:
+        name: apache2
+        state: restarted
+
+# Playbook 2, будет выполняться только на хосте с именем node2 192.168.33.11
+- name: Установка и настройка Nginx в качестве reverse proxy
+  hosts: node2
+  become: true
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Configuration Nginx
+      copy:
+        src: /vagrant/nginx.conf
+        dest: /etc/nginx/
+      notify:
+        - Restart Nginx
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
