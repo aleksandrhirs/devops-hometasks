@@ -1,0 +1,121 @@
+---
+# Playbook 1 Edit key-file permissions
+- name: Touch the file, but add/remove some permissions
+  hosts: master
+  become: true
+  tasks:
+    - file:
+        path: '{{ item.fpath }}'
+        state: file
+        owner: vagrant
+        mode: u+rw,g-rwx,o-rwx
+      loop:
+        - { fpath: /home/vagrant/private_key_slave1 }
+        - { fpath: /home/vagrant/private_key_slave2 }
+
+# Playbook 2, будет выполняться для всех
+- name: Install Puppet, vim, mc for all
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Puppet
+      yum:
+        update_cache: yes
+        name: https://yum.puppet.com/puppet7-release-el-8.noarch.rpm
+        state: present
+        disable_gpg_check: yes
+
+    - name: Install vim, mc
+      yum:
+        name:
+          - vim
+          - nano
+          - mc
+        state: present
+
+    - name: Added master to hosts
+      lineinfile:
+        path: /etc/hosts
+        line: '192.168.50.15 master.puppet puppet'
+        insertafter: EOF
+
+# Playbook 3, будет выполняться для master
+- name: Master config
+  hosts: master
+  become: true
+  tasks:
+    - name: Install Puppet Server, Git
+      yum:
+        update_cache: yes
+        name:
+          - puppetserver
+          - git
+        state: present
+    - name: Set memory limit for Puppet Server
+      lineinfile:
+        path: /etc/sysconfig/puppetserver
+        regexp: '^JAVA_ARGS='
+        line: 'JAVA_ARGS="-Xms512m -Xmx512m -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"'
+
+    - name: Disable firewalld
+      service:
+        name: firewalld
+        enabled: false
+        state: stopped
+
+    - name: Copy autosign.conf
+      copy:
+        src: /vagrant/autosign.conf
+        dest: /etc/puppetlabs/puppet/
+
+    - name: Install r10k
+      command: /opt/puppetlabs/puppet/bin/gem install r10k
+
+    - name: Creates directory for r10k
+      file:
+        path: /etc/puppetlabs/r10k
+        state: directory
+
+    - name: Configure r10k
+      copy:
+        src: /vagrant/r10k.yaml
+        dest: /etc/puppetlabs/r10k/
+
+    - name: Restart Puppet Server
+      service:
+        name: puppetserver
+        state: restarted
+        enabled: true
+
+    - name: Deploy r10k modules
+      command: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
+
+# Playbook 4, будет выполняться для slave1, slave2
+- name: Slave1, Slave2 config
+  hosts:
+    - slave1
+    - slave2
+  become: true
+  tasks:
+    - name: Install Puppet Agent
+      yum:
+        name: puppet-agent
+        state: present
+      notify:
+        - Start Puppet Agent
+
+    - name: Add agent in config
+      blockinfile:
+        path: /etc/puppetlabs/puppet/puppet.conf
+        block: |
+          [agent]
+          server = master.puppet
+          runinterval = 1m
+          environment = production
+
+  handlers:
+    - name: Start Puppet Agent
+      service:
+        name: puppet
+        state: started
+        enabled: true
