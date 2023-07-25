@@ -109,7 +109,7 @@
         enabled: true
 
     - name: Deploy r10k modules
-      command: /opt/puppetlabs/puppet/bin/r10k deploy environment -p puppet
+      command: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
 
     - name: Add r10k cron job
       cron:
