@@ -1,0 +1,8 @@
+---
+
+# Playbook for master - 192.168.33.10
+- name: Master config
+  hosts: master
+  become: true
+  roles:
+    - jenkins-role
