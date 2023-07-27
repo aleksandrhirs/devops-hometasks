@@ -7,11 +7,11 @@ credentials:
   system:
     domainCredentials:
       - credentials:
-          - usernamePassword:
-              scope:    GLOBAL
-              id:       slave_creds
-              username: vagrant
-              password: vagrant
+        - usernamePassword:
+            scope:    GLOBAL
+            id:       nexus_creds
+            username: vagrant
+            password: vagrant
 
 tool:
   go:

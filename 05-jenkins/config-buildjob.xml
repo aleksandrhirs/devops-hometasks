@@ -39,12 +39,23 @@
 
         md5sum artifacts/word-cloud-generator
         gzip artifacts/word-cloud-generator
-        ls -l artifacts/</command>
+        ls -l artifacts/
+
+        echo $NEXUS_USER</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
+    <org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@621.v58c0fb_d285a_c">
+      <bindings>
+        <org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+          <credentialsId>nexus_creds</credentialsId>
+          <usernameVariable>NEXUS_USER</usernameVariable>
+          <passwordVariable>NEXUS_PASSWORD</passwordVariable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+      </bindings>
+    </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
     <org.jenkinsci.plugins.golang.GolangBuildWrapper plugin="golang@1.4">
       <goVersion>go_lang</goVersion>
     </org.jenkinsci.plugins.golang.GolangBuildWrapper>
