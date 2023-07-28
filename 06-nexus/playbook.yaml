@@ -28,6 +28,26 @@
   become: true
   roles:
     - nexus3-oss
+  vars:
+    nexus3_oss_admin_username: "admin"
+    nexus3_oss_admin_password: "admin"
+    nexus3_oss_anonymous_access_enabled: false
+    nexus3_oss_blobstore_type: "File"
+    nexus3_oss_repository_type: "hosted"
+    nexus3_oss_repository_name: "my-repo"
+    nexus3_oss_repository_blobstore_name: "default"
+    nexus3_oss_repository_username: "admin"
+    nexus3_oss_repository_password: "admin"
+  pre_tasks:
+#    - name: Adding repo backports
+#      apt_repository:
+#        repo: "deb http://archive.debian.org/debian stretch-backports main"
+#        state: present
+    - name: Install Java 8
+      apt:
+        update_cache: yes
+        name: openjdk-8-jdk
+        state: present
 #  vars:
 #    nexus_blobstores:
 #      - name: "example-blobstore"
