@@ -1,8 +1,67 @@
 ---
 
-# Playbook for master - 192.168.33.10
+# Playbook Edit key-file permissions
+- name: Touch the file, but add/remove some permissions
+  hosts: master
+  become: true
+  tasks:
+    - file:
+        path: '{{ item.fpath }}'
+        state: file
+        owner: vagrant
+        mode: u+rw,g-rwx,o-rwx
+      loop:
+        - { fpath: /home/vagrant/private_key_nexus }
+        - { fpath: /home/vagrant/private_key_staging }
+        - { fpath: /home/vagrant/private_key_production }
+
+# Playbook for master - 192.168.50.20
 - name: Master config
   hosts: master
   become: true
   roles:
     - jenkins-role
+
+#Playbook for nexus - 192.168.50.5
+- name: Nexus config
+  hosts: nexus
+  become: true
+  roles:
+    - nexus3-oss
+#  vars:
+#    nexus_blobstores:
+#      - name: "example-blobstore"
+#        type: "File"
+#        path: "/var/lib/nexus3/blobs/example-blobstore"
+#        quota_type: "SpaceRemaining"
+#        quota_limit: "1GB"
+#        quota_alert_threshold: "90%"
+#
+#    nexus_repositories:
+#      - name: "example-repo"
+#        type: "hosted"
+#        online: true
+#        blobstore_name: "example-blobstore"
+#        strict_content_type_validation: true
+#        write_policy: "ALLOW_ONCE"
+#        read_policy: "ALLOW"
+#        user_name: "example-user"
+#        anonymous_access_enabled: false
+#
+#    nexus_roles:
+#      - name: "example-role"
+#        description: "Example Role"
+#        privileges:
+#          - name: "nx-repository-view-*"
+#          - name: "nx-repository-admin-*"
+#        roles: [ ]
+#
+#    nexus_users:
+#      - username: "example-user"
+#        password: "example-password"
+#        first_name: "Example"
+#        last_name: "User"
+#        email: "example@example.com"
+#        status: "active"
+#        roles:
+#          - "example-role"
