@@ -4,7 +4,6 @@ plugins:
   - artifactId: plain-credentials
   - artifactId: git
   - artifactId: git-client
-  - artifactId: github
   - artifactId: ssh-credentials
   - artifactId: workflow-scm-step
   - artifactId: pipeline-build-step

@@ -27,61 +27,76 @@
   hosts: nexus
   become: true
   roles:
+    - apache
     - nexus3-oss
-  vars:
-    nexus3_oss_admin_username: "admin"
-    nexus3_oss_admin_password: "admin"
-    nexus3_oss_anonymous_access_enabled: false
-    nexus3_oss_blobstore_type: "File"
-    nexus3_oss_repository_type: "hosted"
-    nexus3_oss_repository_name: "my-repo"
-    nexus3_oss_repository_blobstore_name: "default"
-    nexus3_oss_repository_username: "admin"
-    nexus3_oss_repository_password: "admin"
+
   pre_tasks:
-#    - name: Adding repo backports
-#      apt_repository:
-#        repo: "deb http://archive.debian.org/debian stretch-backports main"
-#        state: present
-    - name: Install Java 8
-      apt:
-        update_cache: yes
-        name: openjdk-8-jdk
+    - name: Add key
+      apt_key:
+        url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+
+    - name: Add repository
+      apt_repository:
+        repo: deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main
         state: present
-#  vars:
-#    nexus_blobstores:
-#      - name: "example-blobstore"
-#        type: "File"
-#        path: "/var/lib/nexus3/blobs/example-blobstore"
-#        quota_type: "SpaceRemaining"
-#        quota_limit: "1GB"
-#        quota_alert_threshold: "90%"
-#
-#    nexus_repositories:
-#      - name: "example-repo"
-#        type: "hosted"
-#        online: true
-#        blobstore_name: "example-blobstore"
-#        strict_content_type_validation: true
-#        write_policy: "ALLOW_ONCE"
-#        read_policy: "ALLOW"
-#        user_name: "example-user"
-#        anonymous_access_enabled: false
-#
-#    nexus_roles:
-#      - name: "example-role"
-#        description: "Example Role"
-#        privileges:
-#          - name: "nx-repository-view-*"
-#          - name: "nx-repository-admin-*"
-#        roles: [ ]
-#
-#    nexus_users:
-#      - username: "example-user"
-#        password: "example-password"
-#        first_name: "Example"
-#        last_name: "User"
-#        email: "example@example.com"
-#        status: "active"
-#        roles:
-#          - "example-role"
+        update_cache: true
+
+    - name: Install Java
+      apt:
+        name: adoptopenjdk-8-hotspot
+        state: present
+
+  vars:
+    nexus_admin_password: "admin"
+    nexus_delete_default_repos: true
+    nexus_config_raw: true
+
+    nexus_repos_raw_hosted:
+      - name: wcg-repo
+        blob_store: default
+
+    nexus_roles:
+      - id: nx-uploader
+        name: nx-uploader
+        description: Role nx-uploader for word-cloud-generator
+        privileges:
+          - nx-repository-view-raw-wcg-repo-*
+        roles: []
+
+    nexus_local_users:
+      - username: nexus-wcg
+        password: "nexus-wcg"
+        first_name: Jenkins
+        last_name: CI
+        email: support@company.com
+        roles:
+          - nx-uploader
+
+#Playbook for staging, production - 192.168.50.10, 192.168.50.15
+- name: Production and Staging config
+  hosts:
+    - staging
+    - production
+  become: true
+
+  tasks:
+    - name: Create wordcloud directory
+      file:
+        path: /opt/wordcloud
+        state: directory
+        owner: vagrant
+        group: vagrant
+
+    - name: Copy wordcloud.service
+      copy:
+        src: "wordcloud.service"
+        dest: /etc/systemd/system/wordcloud.service
+        owner: vagrant
+        group: vagrant
+      notify: Reload systemd
+
+  handlers:
+    - name: Reload systemd
+      become: true
+      systemd:
+        daemon_reload: yes

@@ -4,10 +4,11 @@
   apt:
     update_cache: yes
     pkg:
-      - build-essential
+      - jq
+      - git
       - fontconfig
       - openjdk-11-jre
-      - git
+      - build-essential
     state: present
 
 - name: Add Jenkins repository key and APT entry
@@ -65,6 +66,13 @@
     state: present
     regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
     backup: yes
+
+- name: Copy ssh plagin config
+  copy:
+    src: "/vagrant/roles/jenkins-role/files/org.jvnet.hudson.plugins.SSHBuildWrapper.xml"
+    dest: "/var/lib/jenkins/org.jvnet.hudson.plugins.SSHBuildWrapper.xml"
+    owner: jenkins
+    group: jenkins
 
 - name: Download jenkins-plugin-manager
   get_url:
