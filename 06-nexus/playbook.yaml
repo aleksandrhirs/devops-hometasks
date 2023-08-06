@@ -15,14 +15,14 @@
         - { fpath: /home/vagrant/private_key_staging }
         - { fpath: /home/vagrant/private_key_production }
 
-# Playbook for master - 192.168.50.20
+# Playbook for master - 192.168.33.100
 - name: Master config
   hosts: master
   become: true
   roles:
     - jenkins-role
 
-#Playbook for nexus - 192.168.50.5
+#Playbook for nexus - 192.168.33.90
 - name: Nexus config
   hosts: nexus
   become: true
@@ -64,15 +64,15 @@
         roles: []
 
     nexus_local_users:
-      - username: nexus-wcg
-        password: "nexus-wcg"
+      - username: nexus
+        password: "nexus"
         first_name: Jenkins
         last_name: CI
         email: support@company.com
         roles:
           - nx-uploader
 
-#Playbook for staging, production - 192.168.50.10, 192.168.50.15
+#Playbook for staging, production - 192.168.33.80, 192.168.33.85
 - name: Production and Staging config
   hosts:
     - staging

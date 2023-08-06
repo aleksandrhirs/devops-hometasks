@@ -2,11 +2,18 @@ plugins:
   - artifactId: credentials-binding
   - artifactId: credentials
   - artifactId: plain-credentials
+  - artifactId: parallel-test-executor
   - artifactId: git
   - artifactId: git-client
   - artifactId: ssh-credentials
-  - artifactId: workflow-scm-step
+  - artifactId: workflow-aggregator
+  - artifactId: docker-workflow
+  - artifactId: workflow-basic-steps
+  - artifactId: pipeline-input-step
+  - artifactId: pipeline-stage-step
   - artifactId: pipeline-build-step
+  - artifactId: workflow-scm-step
+  - artifactId: workflow-job
   - artifactId: ssh
   - artifactId: sshd
   - artifactId: ssh-slaves

@@ -1,0 +1,103 @@
+pipeline {
+    agent any
+    tools { go 'go-1.16' }
+    environment {
+        NEXUS_IP="192.168.33.90"
+        STAGING_IP="192.168.33.80"
+        PRODUCTION_IP="192.168.33.85"
+    }
+    stages {
+        stage('1. Pulling code') {
+            steps {
+                git 'https://github.com/aleksandrhirs/word-cloud-generator.git'
+            }
+        }
+        stage('2. Tests') {
+            steps {
+                sh 'make lint'
+                sh 'make test'
+            }
+        }
+        stage('3. Build and Uploud artifacts') {
+            steps {
+                sh '''sed -i "s/1.DEVELOPMENT/1.$BUILD_NUMBER/g" static/version
+                      GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                      gzip -f artifacts/word-cloud-generator
+                      echo $NEXUS_USER
+                '''
+
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: "${NEXUS_IP}:8081",
+                    groupId: 'pipeline',
+                    version: '1.$BUILD_NUMBER',
+                    repository: 'wcg-repo',
+                    credentialsId: 'nexus_creds',
+                    artifacts: [
+                        [artifactId: 'word-cloud-generator',
+                        classifier: '',
+                        file: 'artifacts/word-cloud-generator.gz',
+                        type: 'gz']
+                    ]
+                )
+            }
+        }
+
+        stage('4. Deploy on staging') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus_creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
+
+                    sh '''  ssh vagrant@$STAGING_IP "sudo service wordcloud stop"
+                            ssh vagrant@$STAGING_IP "curl -X GET http://$NEXUS_IP:8081/repository/wcg-repo/pipeline/word-cloud-generator/1.$BUILD_NUMBER/word-cloud-generator-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD"
+                            ssh vagrant@$STAGING_IP 'ls -l /opt/wordcloud'
+                            ssh vagrant@$STAGING_IP 'gunzip -f /opt/wordcloud/word-cloud-generator.gz'
+                            ssh vagrant@$STAGING_IP 'chmod +x /opt/wordcloud/word-cloud-generator'
+                            ssh vagrant@$STAGING_IP 'sudo service wordcloud start'
+                    '''
+                }
+
+            }
+        }
+
+        stage('5. Integration tests') {
+
+            parallel {
+                stage('Integration Test 1') {
+                    steps {
+                        script {
+                            def res = sh(script: 'curl -s -H "Content-Type: application/json" -d \'{"text":"ths is a really really really important thing this is"}\' http://$STAGING_IP:8888/version | jq \'. | length\'', returnStdout: true).trim()
+                            if (res != '1') {
+                                error 'Integration test 1 failed'
+                            }
+                        }
+                    }
+                }
+                stage('Integration Test 2') {
+                    steps {
+                        script {
+                            def res = sh(script: 'curl -s -H "Content-Type: application/json" -d \'{"text":"ths is a really really really important thing this is"}\' http://$STAGING_IP:8888/version | jq \'. | length\'', returnStdout: true).trim()
+                            if (res != '1') {
+                                error 'Integration test 2 failed'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('6. Deploy on production') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus_creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
+
+                    sh '''  ssh vagrant@$PRODUCTION_IP "sudo service wordcloud stop"
+                            ssh vagrant@$PRODUCTION_IP "curl -X GET http://$NEXUS_IP:8081/repository/wcg-repo/pipeline/word-cloud-generator/1.$BUILD_NUMBER/word-cloud-generator-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD"
+                            ssh vagrant@$PRODUCTION_IP 'ls -l /opt/wordcloud'
+                            ssh vagrant@$PRODUCTION_IP 'gunzip -f /opt/wordcloud/word-cloud-generator.gz'
+                            ssh vagrant@$PRODUCTION_IP 'chmod +x /opt/wordcloud/word-cloud-generator'
+                            ssh vagrant@$PRODUCTION_IP 'sudo service wordcloud start'
+                    '''
+                }
+            }
+        }
+    }
+}
