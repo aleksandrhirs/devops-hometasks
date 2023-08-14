@@ -1,0 +1,23 @@
+FROM jenkins/jenkins
+
+USER root
+RUN apt-get update && apt-get install -y jq build-essential fontconfig git && apt-get clean
+
+# Jenkins settings
+ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"
+RUN echo 2.0 > /usr/share/jenkins/ref/jenkins.install.UpgradeWizard.state
+COPY --chown=jenkins:jenkins /files/jenkins/02-admin-user.groovy /usr/share/jenkins/ref/init.groovy.d/02-admin-user.groovy
+
+# Jenkins plugins
+COPY --chown=jenkins:jenkins /files/jenkins/plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
+
+# Copy pipeline job and CAC
+COPY --chown=jenkins:jenkins /files/jenkins/jenkins.yaml /var/jenkins_home/jenkins.yaml
+COPY --chown=jenkins:jenkins /files/jenkins/config.xml /var/jenkins_home/jobs/pipeline/config.xml
+
+EXPOSE 8080
+
+USER jenkins
+
+CMD ["java", "-jar", "/usr/share/jenkins/jenkins.war"]

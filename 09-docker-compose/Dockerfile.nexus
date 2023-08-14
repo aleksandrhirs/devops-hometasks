@@ -1,0 +1,14 @@
+FROM debian:11
+
+RUN apt-get update && \
+    apt-get install -y nano mc ansible sshpass git gnupg rsync bash && \
+    apt-get clean
+
+COPY /files/nexus /vagrant
+
+WORKDIR /vagrant/
+RUN ansible-playbook -i inventory playbook.yaml
+
+EXPOSE 8081
+
+CMD ["sh", "-c", "/opt/nexus-latest/bin/nexus run"]
