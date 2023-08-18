@@ -10,4 +10,4 @@ jobs:
 
     steps:
     -name: step 1
-    run: echo "hello from workflow"
+      run: echo "hello from workflow"
