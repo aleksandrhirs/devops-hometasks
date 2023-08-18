@@ -9,5 +9,5 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    -name: step 1
+    - name: test step
       run: echo "hello from workflow"
