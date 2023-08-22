@@ -9,6 +9,7 @@ env:
   IMAGE_NAME: wcg
   REGISTRY: ghcr.io
   OWNER: '${{ github.repository_owner }}'
+  OWNER_LC: ''
 
 jobs:
   build_and_push:
