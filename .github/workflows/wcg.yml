@@ -1,8 +1,5 @@
 name: WCG worflow
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
