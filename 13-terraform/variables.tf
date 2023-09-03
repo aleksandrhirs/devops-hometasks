@@ -88,7 +88,7 @@ variable "app_name" {
 
 variable "create_index" {
   type    = bool
-  default = false
+  default = true
 }
 
 ## GITHUB VARIABLES
