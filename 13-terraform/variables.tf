@@ -1,6 +1,4 @@
-###################################################
 ## DEPLOYMENT VARIABLES
-###################################################
 
 variable "deploy_name" {
   type    = string
@@ -37,9 +35,7 @@ variable "container_port" {
   default = 8888
 }
 
-###################################################
 ## SERVICE VARIABLES
-###################################################
 
 variable "service_name" {
   type    = string
@@ -56,9 +52,7 @@ variable "service_type" {
   default = "ClusterIP"
 }
 
-###################################################
 ## INGRESS VARIABLES
-###################################################
 
 variable "ingress_name" {
   type    = string
@@ -80,9 +74,7 @@ variable "ingress_path_type" {
   default = "Prefix"
 }
 
-###################################################
 ## LABEL VARIABLES
-###################################################
 
 variable "env" {
   type    = string
@@ -99,9 +91,7 @@ variable "create_index" {
   default = true
 }
 
-###################################################
 ## GITHUB VARIABLES
-###################################################
 
 variable "github_token" {
   type      = string
