@@ -78,7 +78,7 @@ variable "ingress_path_type" {
 
 variable "env" {
   type    = string
-  default = "dev"
+  default = "local"
 }
 
 variable "app_name" {
