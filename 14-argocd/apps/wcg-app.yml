@@ -10,7 +10,7 @@ spec:
 
   source:
     repoURL: 'https://aleksandrhirs.github.io/devops-hometasks'
-    targetRevision: 3.0.1
+    targetRevision: '*'
     chart: word-cloud-generator
 
     helm:
