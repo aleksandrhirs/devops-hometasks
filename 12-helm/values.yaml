@@ -3,7 +3,8 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/aleksandrhirs/wcg
-  tag: c8f9afcfe32d910d233ea1ae264c8865d54d73b8
+#  tag: c8f9afcfe32d910d233ea1ae264c8865d54d73b8
+  tag: ""
 
 service:
   port: 8888

@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  word-cloud-generator:
+  - apiVersion: v2
+    appVersion: "2.0"
+    created: "2023-09-10T14:20:47.2577761+03:00"
+    description: A Helm chart for deploying word-cloud-generator
+    digest: 328ac70d3f9269708c494088e6c047f4c95bae37524f705d27e23ae6be6f6083
+    name: word-cloud-generator
+    urls:
+    - charts/word-cloud-generator-3.0.0.tgz
+    version: 3.0.0
+generated: "2023-09-10T14:20:47.2517119+03:00"
