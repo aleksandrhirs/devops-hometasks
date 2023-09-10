@@ -10,6 +10,7 @@ env:
   REGISTRY: ghcr.io
   OWNER: '${{ github.repository_owner }}'
   OWNER_LC: ''
+  GITHUB_PAGES_URL: https://aleksandrhirs.github.io/devops-hometasks/
 
 jobs:
   build_and_push:
