@@ -1,9 +1,9 @@
 # Значения по умолчанию
-replicaCount: 3
+replicaCount: 1
 
 image:
   repository: ghcr.io/aleksandrhirs/wcg
-  tag: ""
+  tag:
 
 service:
   port: 8888
