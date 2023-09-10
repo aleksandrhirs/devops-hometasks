@@ -3,7 +3,7 @@ entries:
   word-cloud-generator:
   - apiVersion: v2
     appVersion: "2.1"
-    created: "2023-09-10T18:52:58.6911828+03:00"
+    created: "2023-09-10T20:16:49.614839544Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: f1c50746cd2e24a143fc30b5d6ebd0250cd6c2375ff62284c638f8652a2056b2
     name: word-cloud-generator
@@ -12,11 +12,20 @@ entries:
     version: 3.0.1
   - apiVersion: v2
     appVersion: "2.0"
-    created: "2023-09-10T18:52:58.6911828+03:00"
+    created: "2023-09-10T20:16:49.614589844Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: 7598abd4fb2ccca956d3dee0bed637533fde9ea639fceed27621f5f1e719edb0
     name: word-cloud-generator
     urls:
     - https://aleksandrhirs.github.io/devops-hometasks/charts/word-cloud-generator-3.0.0.tgz
     version: 3.0.0
-generated: "2023-09-10T18:52:58.6861943+03:00"
+  - apiVersion: v2
+    appVersion: 0.3.0
+    created: "2023-09-10T20:16:49.614210843Z"
+    description: A Helm chart for deploying word-cloud-generator
+    digest: f3329239f9877e552f833a5e803c667a7f76cc84e45fd20780c9ed686c7cdff3
+    name: word-cloud-generator
+    urls:
+    - https://aleksandrhirs.github.io/devops-hometasks/charts/word-cloud-generator-0.3.0.tgz
+    version: 0.3.0
+generated: "2023-09-10T20:16:49.613652641Z"
