@@ -6,3 +6,4 @@
 
 *.vagrant
 *.terraform
+*.terraform.lock.hcl
