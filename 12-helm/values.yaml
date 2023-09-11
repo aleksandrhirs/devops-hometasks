@@ -1,5 +1,5 @@
 # Значения по умолчанию
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: ghcr.io/aleksandrhirs/wcg

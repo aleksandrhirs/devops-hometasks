@@ -1,0 +1,97 @@
+---
+# tasks file for jenkins-role
+- name: Install packages
+  apt:
+    update_cache: yes
+    pkg:
+      - jq
+      - git
+      - fontconfig
+      - openjdk-11-jre
+      - build-essential
+    state: present
+
+- name: Add Jenkins repository key and APT entry
+  shell: |
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+- name: Install Jenkins
+  apt:
+    update_cache: yes
+    name: jenkins
+    state: present
+
+- name: Create Jenkins jobs and buildjob directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: jenkins
+    group: jenkins
+  with_items:
+    - /var/lib/jenkins/jobs
+    - /var/lib/jenkins/jobs/buildjob
+    - /var/lib/jenkins/init.groovy.d
+
+- name: Copy script files to init.groovy.d
+  copy:
+    src: /vagrant/roles/jenkins-role/files/scripts/
+    dest: /var/lib/jenkins/init.groovy.d/
+    owner: jenkins
+    group: jenkins
+
+- name: Copy job config.xml
+  copy:
+    src: /vagrant/roles/jenkins-role/files/config-buildjob.xml
+    dest: /var/lib/jenkins/jobs/buildjob/config.xml
+
+- name: Copy the jenkins.yaml file
+  copy:
+    dest: "/var/lib/jenkins/jenkins.yaml"
+    src: "/vagrant/roles/jenkins-role/files/jenkins.yaml"
+
+- name: update JENKINS_HOME ownership
+  file:
+    path: /var/lib/jenkins
+    owner: jenkins
+    group: jenkins
+    state: directory
+    recurse: yes
+
+- name: Modify Jenkins service to disable setup wizard
+  lineinfile:
+    path: /lib/systemd/system/jenkins.service
+    line: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+    state: present
+    regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
+    backup: yes
+
+- name: Copy ssh plagin config
+  copy:
+    src: "/vagrant/roles/jenkins-role/files/org.jvnet.hudson.plugins.SSHBuildWrapper.xml"
+    dest: "/var/lib/jenkins/org.jvnet.hudson.plugins.SSHBuildWrapper.xml"
+    owner: jenkins
+    group: jenkins
+
+- name: Download jenkins-plugin-manager
+  get_url:
+    url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.12.13/jenkins-plugin-manager-2.12.13.jar
+    dest: $HOME/jenkins-plugin-manager.jar
+
+- name: Copy the plugins.yaml file
+  copy:
+    dest: "$HOME/plugins.yaml"
+    src: "/vagrant/roles/jenkins-role/files/plugins.yaml"
+
+- name: Run the jenkins-plugin-manager
+  command: java -jar $HOME/jenkins-plugin-manager.jar --jenkins-version 2.401.3 --plugin-file $HOME/plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+
+- name: Reload systemd configuration
+  systemd:
+    daemon_reload: yes
+
+- name: Restart Jenkins service
+  systemd:
+    name: jenkins
+    state: restarted
