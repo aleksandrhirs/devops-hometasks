@@ -2,8 +2,17 @@ apiVersion: v1
 entries:
   word-cloud-generator:
   - apiVersion: v2
+    appVersion: 0.10.0
+    created: "2023-09-11T08:28:56.374149614Z"
+    description: A Helm chart for deploying word-cloud-generator
+    digest: c1f464f71ee661d8ac2a267a424fcc68c28ac3d583145da69e3d9d42572a2677
+    name: word-cloud-generator
+    urls:
+    - https://aleksandrhirs.github.io/devops-hometasks/charts/word-cloud-generator-0.10.0.tgz
+    version: 0.10.0
+  - apiVersion: v2
     appVersion: 0.6.0
-    created: "2023-09-10T20:39:14.228097406Z"
+    created: "2023-09-11T08:28:56.375824643Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: 45bceede34340d3449cef9d350dcae2f666a29d9a745b3cc4b790ec266c60eac
     name: word-cloud-generator
@@ -12,7 +21,7 @@ entries:
     version: 0.6.0
   - apiVersion: v2
     appVersion: 0.5.0
-    created: "2023-09-10T20:39:14.2279075Z"
+    created: "2023-09-11T08:28:56.375621539Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: b19af6552d2418edc27d99a5f125ddea553d4938365de6d395314f8f8eae1683
     name: word-cloud-generator
@@ -21,7 +30,7 @@ entries:
     version: 0.5.0
   - apiVersion: v2
     appVersion: 0.4.0
-    created: "2023-09-10T20:39:14.227681493Z"
+    created: "2023-09-11T08:28:56.375416136Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: 45dd6559c2920ec24cbea18fe5b1b5da93acd16548a85f06d010efb03b54abac
     name: word-cloud-generator
@@ -30,11 +39,11 @@ entries:
     version: 0.4.0
   - apiVersion: v2
     appVersion: 0.3.0
-    created: "2023-09-10T20:39:14.227464087Z"
+    created: "2023-09-11T08:28:56.375181032Z"
     description: A Helm chart for deploying word-cloud-generator
     digest: f3329239f9877e552f833a5e803c667a7f76cc84e45fd20780c9ed686c7cdff3
     name: word-cloud-generator
     urls:
     - https://aleksandrhirs.github.io/devops-hometasks/charts/word-cloud-generator-0.3.0.tgz
     version: 0.3.0
-generated: "2023-09-10T20:39:14.227044175Z"
+generated: "2023-09-11T08:28:56.373602404Z"
